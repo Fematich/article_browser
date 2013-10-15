@@ -5,3 +5,12 @@ The currently supported corpora are:
 - Mediargus-format
 - MUC-format
 - Reuters-format
+
+TODO
+===============
+
+- paginated search results
+- adding tags
+- change settings via browser
+- indexing and other functions in the package
+- add gitignore for venv
