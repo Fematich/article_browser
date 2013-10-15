@@ -1,5 +1,0 @@
-from flask.ext.wtf import Form
-from wtforms import TextField, Required, Length
-
-class SearchForm(Form):
-    search = TextField('search', validators = [Required()])

@@ -1,6 +1,0 @@
-<h3>{{article.title}}</h3>
-{% autoescape false %}
-<p>{{article.content}}</p>
-{% endautoescape %}
-
-	
