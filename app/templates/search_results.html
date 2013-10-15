@@ -1,0 +1,24 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block body %}
+<h1>Search results for "{{query}}":</h1>
+<p>{{nresults}} results</p>
+
+<!--
+<div class="pagination">
+  <ul>
+    {% for page in results %}
+    <li><a href="#">1</a></li>
+    {% endfor %}
+  </ul>
+</div>
+-->
+
+<ol>
+	{% for article in results %}
+	    <li><a href="{{ url_for('article', code=article.code) }}">{{article.title}}</a></li>
+	{% endfor %}
+</ol>
+
+{% endblock %}
