@@ -36,7 +36,7 @@ def search_results(query,page):
     results,numberdocs = finddocs(query, MAX_SEARCH_RESULTS)
     articles=[]
     pagination = Pagination(page, PER_PAGE, numberdocs)
-    for result in results:
+    for result in results[(page-1)*PER_PAGE:page*PER_PAGE]:
         articles.append({'title':result['title'],'code':result['date'].strftime("%Y%m%d")+'+'+str(result['identifier'])})
         #doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
         #articles.append({'title':result['title'],'content':doc.getfullcontent()})
