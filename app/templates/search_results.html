@@ -4,21 +4,45 @@
 {% block body %}
 <h1>Search results for "{{query}}":</h1>
 <p>{{nresults}} results</p>
-
 <!--
 <div class="pagination">
   <ul>
-    {% for page in results %}
-    <li><a href="#">1</a></li>
+    {% for i in range(nresults//100) %}
+    <li><a href="#">{{ loop.index }}</a></li>
     {% endfor %}
   </ul>
 </div>
--->
 
 <ol>
 	{% for article in results %}
 	    <li><a href="{{ url_for('article', code=article.code) }}">{{article.title}}</a></li>
 	{% endfor %}
 </ol>
+-->
 
+{% macro render_pagination(pagination) %}
+  <div class=pagination>
+  {%- for page in pagination.iter_pages() %}
+    {% if page %}
+      {% if page != pagination.page %}
+        <a href="{{ url_for_other_page(page) }}">{{ page }}</a>
+      {% else %}
+        <strong>{{ page }}</strong>
+      {% endif %}
+    {% else %}
+      <span class=ellipsis>…</span>
+    {% endif %}
+  {%- endfor %}
+  {% if pagination.has_next %}
+    <a href="{{ url_for_other_page(pagination.page + 1)
+      }}">Next &raquo;</a>
+  {% endif %}
+  </div>
+{% endmacro %}
+{{render_pagination(pagination)}}
+<ol>
+	{% for article in results[(pagination.page-1)*pagination.per_page:pagination.page*pagination.per_page] %}
+	    <li><a href="{{ url_for('article', code=article.code) }}">{{article.title}}</a></li>
+	{% endfor %}
+</ol>
 {% endblock %}

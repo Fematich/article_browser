@@ -16,7 +16,7 @@ import logging
 logger=logging.getLogger("utils")
 
 
-from config import MAX_SEARCH_RESULTS,RES_PER_PAGE
+from config import MAX_SEARCH_RESULTS,PER_PAGE
 poordirectory="/home/mfeys/work/poor"
 indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
 
