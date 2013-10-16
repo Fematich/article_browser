@@ -9,7 +9,7 @@ The currently supported corpora are:
 TODO
 ===============
 
-- paginated search results
+- --paginated search results--
 - adding tags
 - change settings via browser
 - indexing and other functions in the package
