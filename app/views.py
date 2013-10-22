@@ -24,11 +24,16 @@ def article(code):
 def before_request():
     g.search_form = SearchForm()
 
-@app.route('/search', methods = ['POST'])
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    if not g.search_form.validate_on_submit():
-        return redirect(url_for('index'))
-    return redirect(url_for('search_results', query = g.search_form.search.data))
+    if request.method == 'POST':
+        if not g.search_form.validate_on_submit():
+            return redirect(url_for('index'))
+        return redirect(url_for('search_results', query = g.search_form.search.data))
+    else:
+        return render_template('search.html',
+                               text=False)
+                               #PER_PAGE=PER_PAGE_STANDARD)
 
 @app.route('/search_results/<query>', defaults={'page': 1})
 @app.route('/search_results/<query>/<int:page>')
@@ -53,3 +58,7 @@ def url_for_other_page(page):
     args['page'] = page
     return url_for(request.endpoint, **args)
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    return render_template('settings.html',)
