@@ -1,0 +1,28 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+<!--{% set active_page = "Results" %} -->
+
+{% block body %}
+<h1>Available <a href={{url_for('results')}}>Results</a> for {{rtype}}:</h1>
+<div class="span12">
+    <table class="table" id="sortTableExample">
+        <thead>
+            <tr>
+                {%- for heading in headings %}
+                  <th>{{heading}}</th>
+                {%- endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {%- for entry in entries %}
+                <tr>
+                    {%- for cell in entry %}
+                      <td><a href={{url_for('results',rtype='compare_event',name=entry[0])}}>{{cell}}</a></td>
+                    {%- endfor %}
+                </tr>
+            {%- endfor %}
+        </tbody>
+    </table>
+</div> <!--/.table-responsive -->
+
+{% endblock %}

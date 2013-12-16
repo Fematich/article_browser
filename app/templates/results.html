@@ -7,7 +7,7 @@
 
 <ul>
   {%- for type in types %}
-    <li><a href={{url_for('results',type)}}>{{type}}</a></li>
+    <li><a href={{url_for('results',rtype=type)}}>{{type}}</a></li>
   {%- endfor %}
 </ul>
 

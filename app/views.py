@@ -63,7 +63,16 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 def settings():
     return render_template('settings.html',)
 
-
-@app.route('/results', methods=['GET', 'POST'])
-def results():
-    return render_template('results.html',types=mongo_utils.get_result_types())
+@app.route('/results/<rtype>/<name>')
+@app.route('/results/<rtype>')
+@app.route('/results')
+def results(rtype=None,name=''):
+    if rtype==None:
+        return render_template('results.html',types=mongo_utils.get_result_types())
+    else:
+        if rtype=='compare_events':
+            headings, entries=mongo_utils.get_all_compare_events()
+            return render_template('table.html',rtype=rtype,headings=headings,entries=entries)
+        if rtype=='compare_event':
+            headings, entries=mongo_utils.get_all_compare_event(name=name)
+            return render_template('table2.html',rtype=rtype,name=name,headings=headings,entries=entries)
