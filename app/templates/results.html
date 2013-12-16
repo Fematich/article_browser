@@ -1,0 +1,14 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% set active_page = "Results" %}
+
+{% block body %}
+<h1>Available Result Types:</h1>
+
+<ul>
+  {%- for type in types %}
+    <li><a href={{url_for('results',type)}}>{{type}}</a></li>
+  {%- endfor %}
+</ul>
+
+{% endblock %}

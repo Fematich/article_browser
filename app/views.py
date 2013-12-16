@@ -1,6 +1,6 @@
 from flask import Flask, flash, redirect, render_template, g, abort, request, url_for
 from app import app
-import utils
+import utils, mongo_utils
 from utils import finddocs,PoorDoc
 from forms import SearchForm
 from models import Pagination
@@ -62,3 +62,8 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     return render_template('settings.html',)
+
+
+@app.route('/results', methods=['GET', 'POST'])
+def results():
+    return render_template('results.html',types=mongo_utils.get_result_types())

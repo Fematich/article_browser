@@ -31,7 +31,8 @@
 <body>
 {% set navigation_bar = [
     ('/', 'Home'),
-    (url_for('settings'), 'Settings')
+    (url_for('settings'), 'Settings'),
+    (url_for('results'), 'Results')
 ] -%}
 {% set active_page = active_page|default('index') -%}
     <div class="navbar navbar-inverse navbar-fixed-top">
