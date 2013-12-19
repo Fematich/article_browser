@@ -23,9 +23,9 @@ def get_result_types():
 
 def get_all_compare_events():    
     entries=[]    
-    headings=['name','splitname','min_sim','big','F1','cos_sim','precision','recall']
+    headings=['name','splitname','min_sim','big','F1','cos_sim','precision','recall','non_match']
     for res in datastore.find({"name":"compare_events"}):
-       elements={"splitname":res['parameters']["info"]['splitname'],"min_score":res['parameters']["info"]['min_score'],"min_sim":res['parameters']["info"]['min_sim'],"big":res['parameters']['big'],"name":res['parameters']['name'],"precision":res['result']['precision'],"recall":res['result']['recall'],"cos_sim":res['result']['cos_sim'],"F1":res['result']['F1']}
+       elements={"splitname":res['parameters']["info"]['splitname'],"min_score":res['parameters']["info"]['min_score'],"min_sim":res['parameters']["info"]['min_sim'],"big":res['parameters']['big'],"name":res['parameters']['name'],"precision":res['result']['precision'],"recall":res['result']['recall'],"cos_sim":res['result']['cos_sim'],"F1":res['result']['F1'],"non_match":len(res['result']['non_match'])}
        entry=[cleanoutput(elements[key],key) for key in headings]
        entries.append(entry)
     return headings, entries
