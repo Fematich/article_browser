@@ -76,3 +76,6 @@ def results(rtype=None,name=''):
         if rtype=='compare_event':
             headings, entries=mongo_utils.get_all_compare_event(name=name)
             return render_template('table2.html',rtype=rtype,name=name,headings=headings,entries=entries)
+        else:
+            headings, entries=mongo_utils.get_data(rtype=rtype,name=name)
+            return render_template('table2.html',rtype=rtype,name=name,headings=headings,entries=entries)

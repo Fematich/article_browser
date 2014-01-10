@@ -15,7 +15,10 @@ datastore=work.datastore
 
 def cleanoutput(variable,key):
     if type(variable) is float:
-        variable="%.2f"%variable
+        if key=="F1":
+            variable="%.3f"%variable
+        else:
+            variable="%.2f"%variable
     return variable
 
 def get_result_types():
@@ -23,9 +26,9 @@ def get_result_types():
 
 def get_all_compare_events():    
     entries=[]    
-    headings=['name','splitname','min_sim','big','F1','cos_sim','precision','recall','non_match']
+    headings=['name','splitname','min_sim','big','F1','cos_sim','precision','recall','MAP','non_match']
     for res in datastore.find({"name":"compare_events","parameters.info.dataset":"event_mall"}):
-       elements={"splitname":res['parameters']["info"]['splitname'],"min_score":res['parameters']["info"]['min_score'],"min_sim":res['parameters']["info"]['min_sim'],"big":res['parameters']['big'],"name":res['parameters']['name'],"precision":res['result']['precision'],"recall":res['result']['recall'],"cos_sim":res['result']['cos_sim'],"F1":res['result']['F1'],"non_match":len(res['result']['non_match'])}
+       elements={"splitname":res['parameters']["info"]['splitname'],"min_score":res['parameters']["info"]['min_score'],"min_sim":res['parameters']["info"]['min_sim'],"big":res['parameters']['big'],"name":res['parameters']['name'],"precision":res['result']['precision'],"recall":res['result']['recall'],"cos_sim":res['result']['cos_sim'],"F1":res['result']['F1'],"non_match":len(res['result']['non_match']),"MAP":res['result'].get("MAP",'?')}
        entry=[cleanoutput(elements[key],key) for key in headings]
        entries.append(entry)
     return headings, entries
