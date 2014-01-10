@@ -75,7 +75,7 @@ def results(rtype=None,name=''):
             return render_template('table.html',rtype=rtype,headings=headings,entries=entries)
         if rtype=='compare_event':
             headings, entries=mongo_utils.get_all_compare_event(name=name)
-            return render_template('table2.html',rtype=rtype,name=name,headings=headings,entries=entries)
+            return render_template('compare_event.html',rtype=rtype,name=name,headings=headings,entries=entries)
         else:
             headings, entries=mongo_utils.get_data(rtype=rtype,name=name)
             return render_template('table2.html',rtype=rtype,name=name,headings=headings,entries=entries)

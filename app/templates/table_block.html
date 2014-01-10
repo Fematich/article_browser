@@ -1,0 +1,20 @@
+<div class="span12">
+    <table class="tablesorter" id="sortTableExample">
+        <thead>
+            <tr>
+                {%- for heading in headings %}
+                  <th>{{heading}}</th>
+                {%- endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {%- for entry in entries %}
+                <tr>
+                    {%- for cell in entry %}
+                      <td>{{cell}}</td>
+                    {%- endfor %}
+                </tr>
+            {%- endfor %}
+        </tbody>
+    </table>
+</div> <!--/.table-responsive -->
