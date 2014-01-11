@@ -1,31 +1,25 @@
 <!-- extend base layout -->
 {% extends "base.html" %}
 <!--{% set active_page = "Results" %} -->
-
 {% block sidebar %}
 <div class="well sidebar-nav">
             <ul class="nav nav-list  nav-stacked">
-              <li class="nav-header">Sidebar</li>
-              <li class="active"><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
+              <li class="nav-header">Stats</li>
+              {% for element in parent_elements%}
+                  <li><B>{{element}}:</B> &ensp; {{parent_elements[element]}}</li>
+              {% endfor %}
+              <li class="nav-header">Related</li>
+              <li><a href="#">Bursts</a></li>
+              <li><a href="#">DocSimilarities</a></li>
+              <li class="nav-header">Actions</li>
+              <li><a href="{{url_for('scatterplot',name=name)}}">Generate Scatterplot</a></li>
+              <li><a href="#">get Wilcoxon-rank</a></li>
+              <!-- <li data-toggle="modal" data-target="#myModal"><a href="#">get Wilcoxon-rank</a></li> -->
             </ul>
           </div>
+
 {% endblock %}
 {% block body %}
 <h1>Available <a href={{url_for('results')}}>Results</a> for <a href={{url_for('results',rtype='compare_events')}}>{{rtype}}</a> of {{name}}:</h1>
-
 {% include 'table_block.html' %}
 {% endblock %}

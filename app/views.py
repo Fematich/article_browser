@@ -1,3 +1,4 @@
+import json
 from flask import Flask, flash, redirect, render_template, g, abort, request, url_for
 from app import app
 import utils, mongo_utils
@@ -74,8 +75,14 @@ def results(rtype=None,name=''):
             headings, entries=mongo_utils.get_all_compare_events()
             return render_template('table.html',rtype=rtype,headings=headings,entries=entries)
         if rtype=='compare_event':
-            headings, entries=mongo_utils.get_all_compare_event(name=name)
-            return render_template('compare_event.html',rtype=rtype,name=name,headings=headings,entries=entries)
+            headings, entries, parent_elements =mongo_utils.get_all_compare_event(name=name)
+            return render_template('compare_event.html',rtype=rtype,name=name,headings=headings,entries=entries,parent_elements=parent_elements)
         else:
             headings, entries=mongo_utils.get_data(rtype=rtype,name=name)
             return render_template('table2.html',rtype=rtype,name=name,headings=headings,entries=entries)
+
+@app.route('/scatterplot/<name>')
+def scatterplot(name):
+    data=mongo_utils.get_F1s(name)
+    return render_template('scatterplot.html',data=json.dumps(data))
+    
