@@ -35,12 +35,12 @@ def get_all_compare_events():
 def get_all_compare_event(name):    
     entries=[]    
     parent_elements={}
-    headings=['event','g_size','F1','precision','recall','cos_sim','AP','big']
+    headings=['event','g_size','r_size','F1','precision','recall','cos_sim','AP',"n_matches",'big']
     if name!='':
         parent=evaluation.compare_events.find_one({"parameters.name":name,"parameters.info.dataset":"event_mall","parameters.big":True})
         parent_elements={"min_sim":parent['parameters']["info"]['min_sim'],"precision":parent['result']['precision'],"recall":parent['result']['recall'],"cos_sim":parent['result']['cos_sim'],"F1":parent['result']['F1'],"MAP":parent['result'].get("MAP",'?'),"# events":parent['result']['n_events']}
         for res in evaluation.compare_event.find({"parameters.name":name,"parameters.info.dataset":"event_mall"}):
-            elements={"event":res['parameters']['g_id'],"splitname":res['parameters']["info"]['splitname'],"min_score":res['parameters']["info"]['min_score'],"min_sim":res['parameters']["info"]['min_sim'],"big":res['parameters']['big'],"name":res['parameters']['name'],"precision":res['result']['precision'],"recall":res['result']['recall'],"cos_sim":res['result']['cos_sim'],"F1":res['result']['F1'],"g_size":res['result']['n_g_docs'],"AP":res['result'].get("AP",'?')}    
+            elements={"event":res['parameters']['g_id'],"splitname":res['parameters']["info"]['splitname'],"min_score":res['parameters']["info"]['min_score'],"min_sim":res['parameters']["info"]['min_sim'],"big":res['parameters']['big'],"name":res['parameters']['name'],"precision":res['result']['precision'],"recall":res['result']['recall'],"cos_sim":res['result']['cos_sim'],"F1":res['result']['F1'],"g_size":res['result']['n_g_docs'],"r_size":res['result']['n_r_docs'],"n_matches":res['result']['n_matching_docs'],"AP":res['result'].get("AP",'?')}    
             entry=[cleanoutput(elements[key],key) for key in headings]
             entries.append(entry)
     else:
