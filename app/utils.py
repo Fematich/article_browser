@@ -9,6 +9,10 @@ from xml.dom.minidom import parseString
 from whoosh.index import open_dir
 from whoosh.qparser import QueryParser
 
+from bokeh.plotting import *
+import bokeh.plotting
+import numpy as np
+
 import os
 import nltk
 import logging
@@ -81,3 +85,26 @@ def finddocs(query,MAX_SEARCH_RESULTS):
             res.append({'title':result['title'],'identifier':result['identifier'],'date':result['date']})
                 
     return res,ndocs
+
+# Define a function that will return an HTML snippet.
+def build_plot(datalist,logx=True):
+    # Set the output for our plot.
+    output_file('plot.html', title='Plot')#, js="relative", css="relative")
+    # Create some data for our plot.
+    colors=['red','green','blue','yellow','black']
+#    colors=['tomato','navy']
+    hold()
+    cnt=0
+    for name,data in datalist:
+        cnt+=1
+        print cnt
+        x,y=zip(*data)
+        if logx:
+            scatter([np.log(x_el) for x_el in x] ,list(y) , color=colors[cnt], legend=name)
+        else:
+            scatter(list(x) ,list(y) , color=colors[cnt], legend=name)
+    # Create an HTML snippet of our plot.
+    snippet = curplot().create_html_snippet(embed_base_url='/static/plots/', embed_save_loc='/home/mfeys/work/article_browser/app/static/plots/')
+    # Return the snippet we want to place in our page.
+    print snippet
+    return snippet

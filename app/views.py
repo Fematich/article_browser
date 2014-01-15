@@ -77,6 +77,13 @@ def results(rtype=None,name=''):
         if rtype=='compare_event':
             headings, entries, parent_elements =mongo_utils.get_all_compare_event(name=name)
             return render_template('compare_event.html',rtype=rtype,name=name,headings=headings,entries=entries,parent_elements=parent_elements)
+        if rtype=='compare_events_cos':
+            headings, entries=mongo_utils.get_all_compare_events_cos()
+            return render_template('table.html',rtype=rtype,headings=headings,entries=entries)
+        if rtype=='compare_event_cos':
+            headings, entries, parent_elements =mongo_utils.get_all_compare_event_cos(name=name)
+            return render_template('compare_event.html',rtype=rtype,name=name,headings=headings,entries=entries,parent_elements=parent_elements)
+
         else:
             headings, entries=mongo_utils.get_data(rtype=rtype,name=name)
             return render_template('table2.html',rtype=rtype,name=name,headings=headings,entries=entries)
@@ -86,3 +93,18 @@ def scatterplot(name):
     data=mongo_utils.get_F1s(name)
     return render_template('scatterplot.html',data=json.dumps(data))
     
+@app.route('/scatterplot2/<param>')
+def scatterplot2(param):
+    datalist=[]
+    for source in param.split('+'):
+        datalist.append([source,mongo_utils.get_data(*source.split(':'))])
+    plot_snippet = utils.build_plot(datalist)
+    return render_template('plot.html', snippet=plot_snippet)
+
+@app.route('/splitcompare/<param>')
+def splitcompare(param):
+    datalist=[]
+    for source in param.split('+'):
+        datalist.append([source,mongo_utils.get_F1ifv_minsim(source)])
+    plot_snippet = utils.build_plot(datalist,logx=False)
+    return render_template('plot.html', snippet=plot_snippet)
