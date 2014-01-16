@@ -1,7 +1,18 @@
 <!-- extend base layout -->
 {% extends "base.html" %}
 <!--{% set active_page = "Results" %} -->
+{% from 'macros.html' import tablesorter %}
+{% block script %}
+      {{ super() }}
+        <!-- tablesorter plugin -->
+        <script src="{{ url_for('static', filename = 'vendor/tablesorter/js/jquery.tablesorter.min.js') }}"></script>
+        <!-- tablesorter widget file - loaded after the plugin -->
+        <script src="{{ url_for('static', filename = 'vendor/tablesorter/js/jquery.tablesorter.widgets.min.js') }}"></script>
+        <!-- blue theme stylesheet -->
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'vendor/tablesorter/css/theme.blue.css') }}">
+      {{ tablesorter() }}
 
+{% endblock %}
 {% block body %}
 <h1>Available <a href={{url_for('results')}}>Results</a> for {{rtype}}:</h1>
 <div class="span12">

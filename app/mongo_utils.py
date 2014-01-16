@@ -112,10 +112,14 @@ def get_data(rtype,name):
            print res
     return entries
 
-def get_F1ifv_minsim(name,rtype='compare_events_cos',big=True):
+def get_F1ifv_minsim(name,rtype='compare_events_cos',big=3):
     entries=[]    
     headings=['min_sim','F1']
-    for res in evaluation[rtype].find({"parameters.info.splitname":name,"parameters.info.dataset":"event_mall","parameters.big":big}):
+    if big==3:
+        res_set=evaluation[rtype].find({"parameters.info.splitname":name,"parameters.info.dataset":"event_mall"})
+    else:
+        res_set=evaluation[rtype].find({"parameters.info.splitname":name,"parameters.info.dataset":"event_mall","parameters.big":big})
+    for res in res_set:
         try:
            print res
            elements={"F1":res['result']['F1'],"min_sim":res['parameters']['info']['min_sim']}    
@@ -124,6 +128,21 @@ def get_F1ifv_minsim(name,rtype='compare_events_cos',big=True):
         except Exception:
             print res
     return entries
-         
+   
+def get_F1ifvbig(name,rtype='compare_events_cos',big=3):
+    entries=[]    
+    headings=['big','F1']
+    trans={str(True):0,str(None):1,str(False):2}
+    res_set=evaluation[rtype].find({"parameters.info.splitname":name,"parameters.info.dataset":"event_mall"})
+    for res in res_set:
+        try:
+           elements={"F1":res['result']['F1'],"big":res['parameters']['big']}    
+           entry=[ elements[key] for key in headings]
+           entries.append(entry)
+           print entries
+        except Exception:
+            print res
+    return entries
+
 if __name__ == '__main__':
     print get_all_compare_events()

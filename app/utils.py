@@ -9,8 +9,7 @@ from xml.dom.minidom import parseString
 from whoosh.index import open_dir
 from whoosh.qparser import QueryParser
 
-from bokeh.plotting import *
-import bokeh.plotting
+from bokeh.plotting import scatter, curplot, output_file, hold
 import numpy as np
 
 import os
@@ -21,7 +20,7 @@ logger=logging.getLogger("utils")
 
 
 from config import MAX_SEARCH_RESULTS,PER_PAGE
-poordirectory="/home/mfeys/work/poor"
+poordirectory="/home/mfeys/work/data/poor"
 indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
 
 class PoorDay():

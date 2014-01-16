@@ -1,0 +1,21 @@
+{% set active_page = 'Annotate' -%}
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block body %}
+<h1>Events</h1>
+<ul>
+    {% for event in events %}
+        <li> <a href="{{url_for('annotate.event',event=event.name)}}">{{event.name}}</a> </li>
+    {% endfor %}
+</ul>
+<!--
+<form class="form-search" action="{{url_for('search')}}" method="post" name="search">
+  <input type="text" class="input-medium">
+  <input type="checkbox"> Complete Articles
+  <button type="submit" class="btn">Search</button>
+ 
+</form>
+-->
+
+{% endblock %}

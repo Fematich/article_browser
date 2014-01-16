@@ -108,3 +108,19 @@ def splitcompare(param):
         datalist.append([source,mongo_utils.get_F1ifv_minsim(source)])
     plot_snippet = utils.build_plot(datalist,logx=False)
     return render_template('plot.html', snippet=plot_snippet)
+
+@app.route('/F1ifvbig/<param>')
+def F1ifvbig(param):
+    datalist=[]
+    for source in param.split('+'):
+        datalist.append([source,mongo_utils.get_F1ifvbig(source)])
+    plot_snippet = utils.build_plot(datalist,logx=False)
+    return render_template('plot.html', snippet=plot_snippet)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return render_template('500.html'), 500

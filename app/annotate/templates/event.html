@@ -1,0 +1,44 @@
+{% set active_page = 'Annotate' -%}
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block css %}
+      {{ super() }}
+      <link href="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<h1>{{event.name}}</h1><a href="{{event.link}}">Wikipedia page</a>
+<form class="form-horizontal">
+  <fieldset>
+    <div class="control-group">
+      <label class="control-label" for="reservation">Daterange:</label>
+      <div class="controls">
+        <div class="input-prepend">
+          <span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="daterange" id="daterange" />
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</form>
+<p>{{nresults}} articles</p>
+     {% for article in articles %}
+	    <li><a href="{{ url_for('article', code=article.code) }}">{{article.title}}</a></li>
+	{% endfor %}
+{% endblock %}
+
+ 
+{% block script %}
+      {{ super() }}
+      <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script> 
+      <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/moment.min.js') }}"></script>
+      <script type="text/javascript">
+      $('input[name="daterange"]').daterangepicker(
+  { 
+    format: 'YYYY-MM-DD',
+    startDate: '2011-01-01',
+    endDate: '2011-12-31'
+  }
+);
+      </script>
+{% endblock %}

@@ -1,5 +1,16 @@
 <!-- extend base layout -->
 {% extends "base.html" %}
+{% from 'macros.html' import tablesorter %}
+{% block script %}
+      {{ super() }}
+        <!-- tablesorter plugin -->
+        <script src="{{ url_for('static', filename = 'vendor/tablesorter/js/jquery.tablesorter.min.js') }}"></script>
+        <!-- tablesorter widget file - loaded after the plugin -->
+        <script src="{{ url_for('static', filename = 'vendor/tablesorter/js/jquery.tablesorter.widgets.min.js') }}"></script>
+        <!-- blue theme stylesheet -->
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'vendor/tablesorter/css/theme.blue.css') }}">
+      {{ tablesorter() }}
+{% endblock %}
 <!--{% set active_page = "Results" %} -->
 {% block sidebar %}
 <div class="well sidebar-nav">
