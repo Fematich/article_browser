@@ -18,6 +18,19 @@ def get_events():
     return events
 def get_event(name):
     return annotations.reference_events.find_one({"name":name})
+def add_user_article(name,user,article):
+    annotations.user_events.update({"name":name,"user":user},
+                                    {"$addToSet": {"articles": article}},
+                                    upsert=True
+                                    )
+
+def get_user_articles(name,user):
+    articles=annotations.user_events.find_one({"name":name,"user":user})
+    if not articles:
+        return []
+    else:
+        return articles["articles"]
+
 
 def add_events():
 #    eventstring='''AanslagenNoorwegen

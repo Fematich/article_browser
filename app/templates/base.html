@@ -62,6 +62,7 @@
            {% block sidebar %}{% endblock %}
         </div><!--/span-->
         <div class="span6">
+          {% include 'flash.html' %}
 	    {% block body %}{% endblock %}
         </div><!--/span-->
       </div><!--/row-->
@@ -73,7 +74,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% endblock %}
       <footer>
-        <p>IBCN, Matthias Feys 2013-2014</p>
+        <p>IBCN, 2013-2014</p>
       </footer>
 
     </div><!--/.fluid-container   &copy; -->

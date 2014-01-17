@@ -1,3 +1,29 @@
+{% macro render_pagination(pagination,page_gen) %}
+{% if pagination.total_count>0 %}
+      <div class="pagination pagination-centered">
+    <ul>
+      {%- for page in pagination.iter_pages() %}
+        {% if page %}
+          {% if page != pagination.page %}
+            <li><a href="{{ page_gen }}/{{page}}">{{ page }}</a></li>
+          {% else %}
+    	<li class="disabled"><span>{{ page }}</span></li>
+            <!--<li><strong>{{ page }}</strong></li>-->
+          {% endif %}
+        {% else %}
+          <li><span class=ellipsis>…</span></li>
+        {% endif %}
+      {%- endfor %}
+      {% if pagination.has_next %}
+        <li><a href="{{ page_gen }}/{{pagination.page+1}}">Next &raquo;</a></li>
+      {% endif %}
+    </ul>
+      </div>
+{% endif %}
+{% endmacro %}
+<!-- ############################################################################################
+#################################################################################################
+############################################################################################# -->
 {% macro tablesorter() %}
 <script>$(function() {
 

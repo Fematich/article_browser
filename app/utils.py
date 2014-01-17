@@ -8,6 +8,8 @@ import zipfile
 from xml.dom.minidom import parseString
 from whoosh.index import open_dir
 from whoosh.qparser import QueryParser
+from whoosh.query import DateRange
+from whoosh.sorting import Facets
 
 from bokeh.plotting import scatter, curplot, output_file, hold
 import numpy as np
@@ -21,7 +23,7 @@ logger=logging.getLogger("utils")
 
 from config import MAX_SEARCH_RESULTS,PER_PAGE
 poordirectory="/home/mfeys/work/data/poor"
-indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
+indexdir='/home/mfeys/work/data/mediargus_2011_be/index'
 
 class PoorDay():
     def __init__(self,docs=None,date=None,zipname=None,poordirectory=poordirectory):
@@ -70,20 +72,24 @@ class PoorDoc():
         zpfile.writestr(name,self.dom.toprettyxml(),compress_type=0)
 
 
-def finddocs(query,MAX_SEARCH_RESULTS):
+def finddocs(query, daterange=None, page=0,ndocs=PER_PAGE, MAX_SEARCH_RESULTS=MAX_SEARCH_RESULTS,distribution=True):
     ix = open_dir(indexdir)
     res=[]
-    tel=0
     with ix.searcher() as searcher:
         parser = QueryParser("content", ix.schema)
         myquery = parser.parse(query)
+        if daterange!=None:
+            datequery=DateRange("date", daterange[0],daterange[1])
+            myquery=myquery & datequery
         results = searcher.search(myquery,limit=MAX_SEARCH_RESULTS)
-	#results = searcher.search_page(myquery, 5, pagelen=20)
-        ndocs=results.estimated_length()
-        for result in results:
-            res.append({'title':result['title'],'identifier':result['identifier'],'date':result['date']})
-                
-    return res,ndocs
+        total_docs=results.estimated_length()
+        if distribution:
+            myfacet=Facets().add_field("date",maptype=sorting.Count)
+            res=searcher.search(myquery,groupedby=myfacet)
+        for result in results[(page-1)*ndocs:page*ndocs]:
+            res.append({'title':result['title'],'identifier':result['identifier'],'date':result['date']})              
+        return res, total_docs
+       
 
 # Define a function that will return an HTML snippet.
 def build_plot(datalist,logx=True):

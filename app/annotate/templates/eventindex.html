@@ -3,6 +3,27 @@
 {% extends "base.html" %}
 
 {% block body %}
+<h1>Instructies</h1>
+Het is de bedoeling dat van alle onderstaande events, alle gerelateerde events uit de corpus gevonden worden.
+Deze artikels kun je opzoeken door verschillende queries te proberen over de corpus met woorden die er wel of niet in moeten voorkomen.
+Hierbij is het mogelijk om gebruik te maken van logische operateren en haakjes:
+<ul>
+<li>operatoren: NOT, AND, OR </li>
+<li>haakjes: ) en ( </li>
+</ul>
+<p>Om een beter idee te hebben over wat de events gaan en wanneer deze zich voordeden, is er ook een wikipedialink voorzien naar de event-pagina daar. Per artikel kun je ook op de titel klikken om deze in geval van twijfel volledig te lezen.
+
+<p>Na het selecteren van de correcte link tussen een artikel en het event:
+<ul>
+<li>Core</li>
+<li>Strongly Related</li>
+<li>Weakly Related</li>
+<li>Unrelated</li>
+</ul>
+kun je jouw selecties opslaan door op submit te drukken onderaan de pagina.
+Hierdoor worden alle artikels die geannoteerd zijn als annotated bestempeld. Artikels waarvoor niets geselecteerd is, worden niet gesubmit.
+
+
 <h1>Events</h1>
 <ul>
     {% for event in events %}

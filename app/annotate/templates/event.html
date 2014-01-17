@@ -1,30 +1,65 @@
 {% set active_page = 'Annotate' -%}
 <!-- extend base layout -->
 {% extends "base.html" %}
-
+{% from 'macros.html' import tablesorter, render_pagination %}
+{% set relations = ['Core','Strongly Related','Weakly Related','Unrelated'] -%}
 {% block css %}
       {{ super() }}
       <link href="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
-<h1>{{event.name}}</h1><a href="{{event.link}}">Wikipedia page</a>
-<form class="form-horizontal">
-  <fieldset>
-    <div class="control-group">
-      <label class="control-label" for="reservation">Daterange:</label>
-      <div class="controls">
-        <div class="input-prepend">
-          <span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="daterange" id="daterange" />
-        </div>
-      </div>
-    </div>
-  </fieldset>
+<h1>{{event.name}}</h1><a href="{{event.link}}" target="_blank">Wikipedia page</a>
+<form class="form" action="" method="post" name="search">
+          {{form.hidden_tag()}}
+        <ul class="inline">
+          <li><label href="#" for="query" id="query" data-toggle="tooltip" data-placement="bottom" title="combinaties met NOT AND OR en gebruik haakjes mogelijk"> query</label>{{form.query()}}</li>
+          <li><label for="daterange">daterange </label>{{form.daterange()}}</li>
+          <li><button type="submit" class="btn btn btn-primary"> Search </button></li>
+        </ul>
 </form>
-<p>{{nresults}} articles</p>
-     {% for article in articles %}
-	    <li><a href="{{ url_for('article', code=article.code) }}">{{article.title}}</a></li>
-	{% endfor %}
+{% if pagination.total_count>0 %}
+    <p>{{nresults}} articles</p>
+    {{render_pagination(pagination, page_gen)}}
+    <form class="form" action="{{url_for('annotate.submit_event',event=event.name)}}" method="post" name="search">
+    <fieldset>
+    <table class="table table-striped">
+      <thead>
+                <tr>
+                    {%- for heading in ['date','title',' | '.join(relations)] %}
+                      <th>{{heading}}</th>
+                    {%- endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {%- for article in articles %}
+                    <tr>
+                          <td>{{article.date.strftime('%d/%m/%Y')}}</td>
+                          <td><a href={{ url_for('article', code=article.code) }}>{{article.title[:120]}}</a></td>
+                          <td>
+                            <div class="form-group" >
+                                <div class="col-lg-9">
+                                    <ul class="inline">
+                                        {% if article.relevance==None %}
+                                            {% for relation in relations %}
+                                                <li><div class="radio"><input type="radio" name="{{article.code}}" id="{{relation}}" value={{relation}}></div></li>
+                                            {% endfor %}
+                                        {% else %}
+                                            {{article.relevance}}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {%- endfor %}
+            </tbody>
+        </table>
+    <button type="submit" class="btn">Submit</button>
+      </fieldset>
+    </form>
+    {{render_pagination(pagination, page_gen)}}
+{% endif %}
 {% endblock %}
 
  
@@ -35,10 +70,11 @@
       <script type="text/javascript">
       $('input[name="daterange"]').daterangepicker(
   { 
-    format: 'YYYY-MM-DD',
-    startDate: '2011-01-01',
-    endDate: '2011-12-31'
+    format: 'DD-MM-YYYY',
+    startDate: '01-01-2011',
+    endDate: '31-12-2011'
   }
 );
+$('#query').tooltip('hide')
       </script>
 {% endblock %}
