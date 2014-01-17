@@ -59,6 +59,9 @@
       </fieldset>
     </form>
     {{render_pagination(pagination, page_gen)}}
+    <div id="plot">
+        {{ snippet|safe }}
+    </div>
 {% endif %}
 {% endblock %}
 
@@ -77,4 +80,10 @@
 );
 $('#query').tooltip('hide')
       </script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.css') }}" type="text/css" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/continuum.css') }}" type="text/css" />
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bokeh.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.css') }}" type="text/css" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/continuum.css') }}" type="text/css" />
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bokeh.js') }}"></script>
 {% endblock %}

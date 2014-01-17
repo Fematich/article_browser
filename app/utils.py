@@ -6,12 +6,13 @@ Created on Oct 14, 2013
 
 import zipfile
 from xml.dom.minidom import parseString
+from whoosh import sorting
 from whoosh.index import open_dir
 from whoosh.qparser import QueryParser
 from whoosh.query import DateRange
 from whoosh.sorting import Facets
 
-from bokeh.plotting import scatter, curplot, output_file, hold
+from bokeh.plotting import scatter, curplot, output_file, hold, line
 import numpy as np
 
 import os
@@ -75,19 +76,30 @@ class PoorDoc():
 def finddocs(query, daterange=None, page=0,ndocs=PER_PAGE, MAX_SEARCH_RESULTS=MAX_SEARCH_RESULTS,distribution=True):
     ix = open_dir(indexdir)
     res=[]
+    daycount={}
     with ix.searcher() as searcher:
         parser = QueryParser("content", ix.schema)
         myquery = parser.parse(query)
         if daterange!=None:
             datequery=DateRange("date", daterange[0],daterange[1])
             myquery=myquery & datequery
-        results = searcher.search(myquery,limit=MAX_SEARCH_RESULTS)
-        total_docs=results.estimated_length()
         if distribution:
-            myfacet=Facets().add_field("date",maptype=sorting.Count)
-            res=searcher.search(myquery,groupedby=myfacet)
-        for result in results[(page-1)*ndocs:page*ndocs]:
-            res.append({'title':result['title'],'identifier':result['identifier'],'date':result['date']})              
+            myfacet=Facets().add_field("date",maptype=sorting.UnorderedList)
+            results=searcher.search(myquery,groupedby=myfacet,limit=MAX_SEARCH_RESULTS)
+            doc_cnt=0
+            for day,docs in results.groups().iteritems():
+                daycount[day]=len(docs)
+                for result in docs:
+                    if doc_cnt in range((page-1)*ndocs,page*ndocs):
+                        res.append({'title':searcher.stored_fields(doc_cnt)['title'],'identifier':searcher.stored_fields(doc_cnt)['identifier'],'date':searcher.stored_fields(doc_cnt)['date']})
+                    doc_cnt+=1
+            total_docs=results.estimated_length()
+            return res, total_docs, daycount
+        else:
+            results = searcher.search(myquery,limit=MAX_SEARCH_RESULTS)
+            for result in results[(page-1)*ndocs:page*ndocs]:
+                res.append({'title':result['title'],'identifier':result['identifier'],'date':result['date']})              
+        total_docs=results.estimated_length()
         return res, total_docs
        
 
@@ -111,5 +123,14 @@ def build_plot(datalist,logx=True):
     # Create an HTML snippet of our plot.
     snippet = curplot().create_html_snippet(embed_base_url='/static/plots/', embed_save_loc='/home/mfeys/work/article_browser/app/static/plots/')
     # Return the snippet we want to place in our page.
-    print snippet
+    return snippet
+
+def build_timeplot(data):
+    output_file('plot.html', title='distribution')#, js="relative", css="relative")
+    x,y=zip(*[[key,data[key]] for key in data])
+    line([np.datetime64(dd).astype(long)/1000 for dd in x] , list(y))  
+    # Create an HTML snippet of our plot.
+    snippet = curplot().create_html_snippet(embed_base_url='/static/plots/', embed_save_loc='/home/mfeys/work/article_browser/app/static/plots/')
+    # Return the snippet we want to place in our page.
+    print snippet    
     return snippet

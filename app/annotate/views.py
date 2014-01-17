@@ -14,7 +14,7 @@ from app import db
 from . import annotate
 import mongo_utils
 from forms import SearchDateRangeForm
-from app.utils import finddocs
+from app.utils import finddocs, build_timeplot
 from app.models import Pagination
 from config import MAX_SEARCH_RESULTS, PER_PAGE
 from whoosh.index import open_dir
@@ -74,7 +74,8 @@ def event(event,query='',daterange=None,page=1):
             except Exception:
                 form.daterange.data='01-01-2011 - 31-12-2011'
                 daterange_dates=None
-        results, numberdocs = finddocs(query, daterange=daterange_dates, page=page)
+        results, numberdocs, daycount = finddocs(query, daterange=daterange_dates, page=page)
+        snippet=build_timeplot(daycount)
         pagination = Pagination(page, PER_PAGE, numberdocs)
         articles=[]
         annotated_articles=mongo_utils.get_user_articles(event['name'],g.user.id)
@@ -86,13 +87,13 @@ def event(event,query='',daterange=None,page=1):
             articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code)})
             #doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
             #articles.append({'title':result['title'],'content':doc.getfullcontent()})
-        print url_for('annotate.event',query=form.query.data,daterange=daterange,event=event['name'])
         return render_template('event.html',
                                event=event,
                                form=form,
                                nresults=numberdocs,
                                articles = articles,
                                pagination=pagination,
+                               snippet=snippet,
                                page_gen=url_for('annotate.event',
                                                 query=query,
                                                 daterange=daterange,
@@ -104,7 +105,8 @@ def event(event,query='',daterange=None,page=1):
                            form=form,
                            nresults=0,
                            articles = [],
-                           pagination=pagination)
+                           pagination=pagination,
+                           snippet='')
 
 @annotate.route('submit/<event>', methods = ['POST'])
 @login_required
