@@ -4,39 +4,54 @@
 
 {% block body %}
 <h1>Instructies</h1>
+<h3>Queries genereren</h3>
+<h4>Opdracht</h4>
 Het is de bedoeling dat van alle onderstaande events, alle gerelateerde events uit de corpus gevonden worden.
-Deze artikels kun je opzoeken door verschillende queries te proberen over de corpus met woorden die er wel of niet in moeten voorkomen.
-Hierbij is het mogelijk om gebruik te maken van logische operateren en haakjes:
+Deze artikels kun je opzoeken door verschillende queries te proberen over de corpus met woorden die er wel of niet in moeten voorkomen + het verfijnen van het zoekvenster door een daterange op te geven. 
+Hierbij is het de bedoeling dat alle relevante artikels nog steeds in de zoekresultaten zitten. Kies dit zoekvenster dus zeker niet te klein. 
+Gebruik het dus enkel als je weet dat er bv. geen artikels over een ramp kunnen gepubliceerd zijn als deze zich nog niet voordeed, waardoor artikels die toch in de query overbleven vor deze datum, sowieso niet over het event gaan...
+<h4>Query Syntax</h4>
+Hierbij is het aangeraden om gebruik te maken van logische operateren, haakjes en aanhalingstekens...
 <ul>
 <li>operatoren: NOT, AND, OR </li>
 <li>haakjes: ) en ( </li>
+<li>aanhalingstekens, ENKEL: " (dubbel aanhalingsteken)!, deze dient om enkel matches weer te geven waarbij meerdere woorden bij elkaar moeten staan bv. "Johan Van de Lanotte" </li>
+<li>gebruik hoofdletters heeft geen invloed</li>
 </ul>
-<p>Om een beter idee te hebben over wat de events gaan en wanneer deze zich voordeden, is er ook een wikipedialink voorzien naar de event-pagina daar. Per artikel kun je ook op de titel klikken om deze in geval van twijfel volledig te lezen.
-
-<p>Na het selecteren van de correcte link tussen een artikel en het event:
+<h4>Tips</h4>
+<p>Om een beter idee te hebben over wat de events gaan en wanneer deze zich voordeden, is er ook een wikipedialink voorzien. (Deze link wordt geopend in een apart tabblad.)
+<p>Om alle mogelijk gerelateerde artikels terug te vinden is het belangrijk om veel gebruik te maken van OR en haakjes:
 <ul>
-<li>Core</li>
-<li>Strongly Related</li>
-<li>Weakly Related</li>
-<li>Unrelated</li>
+<li>synoniemen of gerelateerde woorden, bv. voor ontploffing (bom OR ontploft OR ontplofte OR ontploft OR explosief OR explosie)</li>
+<li>verschillende schrijfwijzen: (vandelanotte OR "van de lanotte" OR "vande lanotte" OR "van de lannotte" OR "vande lannotte" )</li>
+<li>soms is er een simpelere oplossing: (vandelanotte OR "van de lanotte" OR "vande lanotte" OR "van de lannotte" OR "vande lannotte" ) <br> --> (lanotte OR lannotte OR lannote)</li>
 </ul>
-kun je jouw selecties opslaan door op submit te drukken onderaan de pagina.
-Hierdoor worden alle artikels die geannoteerd zijn als annotated bestempeld. Artikels waarvoor niets geselecteerd is, worden niet gesubmit.
-
-
+<p> Voor het selecteren van de daterange:
+<ul>
+<!-- <li>We zoeken een aaneengesloten periode waarin er artikels rond het event voorkomen</li>-->
+<li> Hierbij kun je gebruik maken van de grafiek op de linkerzijde</li>
+</ul>
+<h3>Artikels annoteren</h3>
+<h4>Opdracht</h4>
+Voor ieder artikel uit de lijst van artikels, moet er aangeduid worden in welke mate dat artikel volgens jou belangrijks is voor de opgegeven gebeurtenis. 
+Hierbij moet er een van de volgende niveau's worden gebruikt:
+<ul>
+<li>Core: het artikel gaat integraal over de gebeurtenis in kwestie, en beschrijft deze integraal. Als je algemene informatie over deze gebeurtenis zoekt, hoort dit artikel bovenaan in de resultaten.</li>
+<li>Strong: het artikel gaat volledig over de gebeurtenis, maar beschrijft eerder een deelaspect ervan dan een volledig overzicht.</li>
+<li>Weak: het artikel heeft te maken met de gebeurtenis zelf, maar niet noodzakelijk helemaal, en bevat weinig essentiële informatie.</li>
+<li>Distant: het artikel is in de verte gerelateerd met de gebeurtenis, maar dan enkel lang voordien of nadien.</li>
+<li>No: het artikel heeft op GEEN enkele manier te maken met de gebeurtenis.</li>
+<li>(probleem): eender welke situatie die een probleem geeft om een label te kiezen. Bv: het artikel bv. bestaat uit een verzameling kleinere artikels, ev. met ongerelateerde titel.</li>
+</ul>
+<h4>Tips</h4>
+Soms is de titel en de snippet van het artikel onduidelijk om te beslissen in welke mate een artikel tot een event behoort. In dit geval kun je op de titel drukken en dan wordt het volledige artikel geopend.
+Als je het artikel gelezen hebt, kun je teruggaan naar de annotaties, door back te drukken in de browser. De huidige selecties (ook de niet gesubmitte selecties) zullen hierdoor NIET verloren gaan.
+{% endblock %}
+{% block sidebar %}
 <h1>Events</h1>
 <ul>
     {% for event in events %}
         <li> <a href="{{url_for('annotate.event',event=event.name)}}">{{event.name}}</a> </li>
     {% endfor %}
 </ul>
-<!--
-<form class="form-search" action="{{url_for('search')}}" method="post" name="search">
-  <input type="text" class="input-medium">
-  <input type="checkbox"> Complete Articles
-  <button type="submit" class="btn">Search</button>
- 
-</form>
--->
-
 {% endblock %}

@@ -1,34 +1,25 @@
 # -*- coding: utf8 -*-
 """
-@author:    Matthias Feys (matthiasfeys@spurrit.com), Spurrit
-@date:      %(date)
+@author:    Matthias Feys (matthiasfeys@gmail.com), IBCN (Ghent University)
+@date:      ...
 """
 import logging
 from datetime import datetime
 from flask import flash, redirect, render_template, g, url_for, abort, request
 from flask_security.core import current_user
 from flask.ext.security import login_required
-from flask.ext.wtf import Form
-from wtforms import RadioField
 from app import db
 from . import annotate
 import mongo_utils
 from forms import SearchDateRangeForm
-from app.utils import finddocs, build_timeplot
+from app.utils import finddocs, build_timeplot, PoorDoc, findsnippets
 from app.models import Pagination
-from config import MAX_SEARCH_RESULTS, PER_PAGE
-from whoosh.index import open_dir
-from whoosh.qparser import QueryParser
-from whoosh.query import CompoundQuery, DateRange
-poordirectory="/home/mfeys/work/data/poor"
-indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
-
+from config import PER_PAGE, content
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger=logging.getLogger("TODO")
 
 @annotate.before_request
 def before_request():
-#    login_user(_datastore.find_user(email='matthiasfeys@gmail.com'))
     g.user = current_user
     if g.user.is_authenticated():
         db.session.add(g.user)
@@ -55,15 +46,25 @@ def event(event,query='',daterange=None,page=1):
     numberdocs=0
     form=SearchDateRangeForm()
     if form.validate_on_submit():
-        query=form.query.data
-        page=1
-        daterange_dates=None
-        if form.daterange.data!='':
-            daterange=form.daterange.data
-        return redirect(url_for('annotate.event',
+        if 'Save' in request.form.values():
+            mongo_utils.save_query(name=event["name"],user=g.user.id,query=query,daterange=daterange)
+            flash("Succesfully saved query and daterange")
+            return redirect(url_for('annotate.event',
                                     query=query,
                                     daterange=daterange,
                                     event=event['name']))
+        else:
+            query=form.query.data
+            page=1
+            daterange_dates=None
+            if form.daterange.data!='':
+                daterange=form.daterange.data
+            else:
+                daterange=None
+            return redirect(url_for('annotate.event',
+                                        query=query,
+                                        daterange=daterange,
+                                        event=event['name']))
     if query!='':
         form.query.data=query
         if daterange!=None:
@@ -74,7 +75,10 @@ def event(event,query='',daterange=None,page=1):
             except Exception:
                 form.daterange.data='01-01-2011 - 31-12-2011'
                 daterange_dates=None
-        results, numberdocs, daycount = finddocs(query, daterange=daterange_dates, page=page)
+        if content:
+            results, numberdocs, daycount = finddocs(query, daterange=daterange_dates, page=page)
+        else:
+            results, numberdocs, daycount = findsnippets(query, daterange=daterange_dates, page=page)
         snippet=build_timeplot(daycount)
         pagination = Pagination(page, PER_PAGE, numberdocs)
         articles=[]
@@ -84,11 +88,15 @@ def event(event,query='',daterange=None,page=1):
             relevance[article["article_id"]]=article['relevance']
         for result in results:
             code=result['date'].strftime("%Y%m%d")+'+'+str(result['identifier'])
-            articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code)})
-            #doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
-            #articles.append({'title':result['title'],'content':doc.getfullcontent()})
+            if content:
+                doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
+                articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':doc.getsnippet()})
+            else:
+                articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':result['snippet']})
+            
         return render_template('event.html',
                                event=event,
+                               user_event=mongo_utils.get_user_event(event['name'],g.user.id),
                                form=form,
                                nresults=numberdocs,
                                articles = articles,
@@ -102,6 +110,7 @@ def event(event,query='',daterange=None,page=1):
     pagination = Pagination(page, PER_PAGE, 0)
     return render_template('event.html',
                            event=event,
+                           user_event=mongo_utils.get_user_event(event['name'],g.user.id),
                            form=form,
                            nresults=0,
                            articles = [],

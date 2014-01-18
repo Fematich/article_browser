@@ -18,4 +18,5 @@ pip install pandas
 pip install redis
 pip install bokeh
 pip install flask-security
-
+pip install whoosh
+pip install requests

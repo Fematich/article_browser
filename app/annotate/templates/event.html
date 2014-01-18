@@ -1,8 +1,9 @@
 {% set active_page = 'Annotate' -%}
+{% from 'macros.html' import show_hide %}
 <!-- extend base layout -->
 {% extends "base.html" %}
 {% from 'macros.html' import tablesorter, render_pagination %}
-{% set relations = ['Core','Strongly Related','Weakly Related','Unrelated'] -%}
+{% set relations = ['Core','Strong','Weak','Distant','No','(probleem)'] -%}
 {% block css %}
       {{ super() }}
       <link href="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet">
@@ -16,17 +17,18 @@
           <li><label href="#" for="query" id="query" data-toggle="tooltip" data-placement="bottom" title="combinaties met NOT AND OR en gebruik haakjes mogelijk"> query</label>{{form.query()}}</li>
           <li><label for="daterange">daterange </label>{{form.daterange()}}</li>
           <li><button type="submit" class="btn btn btn-primary"> Search </button></li>
+          <li><input type="submit" name="btn btn btn-primary" value="Save"></li>
         </ul>
 </form>
+<p>{{nresults}} articles</p>
 {% if pagination.total_count>0 %}
-    <p>{{nresults}} articles</p>
     {{render_pagination(pagination, page_gen)}}
     <form class="form" action="{{url_for('annotate.submit_event',event=event.name)}}" method="post" name="search">
     <fieldset>
     <table class="table table-striped">
       <thead>
                 <tr>
-                    {%- for heading in ['date','title',' | '.join(relations)] %}
+                    {%- for heading in ['date','title','relatedness'] %}
                       <th>{{heading}}</th>
                     {%- endfor %}
                 </tr>
@@ -35,21 +37,29 @@
                 {%- for article in articles %}
                     <tr>
                           <td>{{article.date.strftime('%d/%m/%Y')}}</td>
-                          <td><a href={{ url_for('article', code=article.code) }}>{{article.title[:120]}}</a></td>
+                          <td>
+                              <a href={{ url_for('article', code=article.code) }}>{{article.title[:120]}}</a>
+                              <br>{{article.snippet|safe}} ...
+                          </td>
                           <td>
                             <div class="form-group" >
                                 <div class="col-lg-9">
-                                    <ul class="inline">
+                                    
                                         {% if article.relevance==None %}
                                             {% for relation in relations %}
-                                                <li><div class="radio"><input type="radio" name="{{article.code}}" id="{{relation}}" value={{relation}}></div></li>
+                                                <div class="radio"><input type="radio" name="{{article.code}}" id="{{relation}}" value={{relation}}>{{relation}}</div>
                                             {% endfor %}
                                         {% else %}
                                             {{article.relevance}}
                                         {% endif %}
-                                    </ul>
+                                    
                                 </div>
                             </div>
+                        </td>
+                        <td>
+                            {% if article.relevance==None %}
+                                <button type="submit" class="btn">Submit</button>
+                            {% endif %}
                         </td>
                     </tr>
                 {%- endfor %}
@@ -59,31 +69,69 @@
       </fieldset>
     </form>
     {{render_pagination(pagination, page_gen)}}
-    <div id="plot">
-        {{ snippet|safe }}
-    </div>
 {% endif %}
 {% endblock %}
 
+{% block sidebar %}
+<div class="well sidebar-nav">
+    <div class="panel-group" id="accordion">
+      <div class="panel panel-default">
+        
+        
+        <div class="panel-heading">
+            <h4 class="panel-title">Stats</h4>
+        </div>
+        {% if user_event!=None %}
+            <div class="panel-body">
+                <ul>
+                {% for key in user_event %}
+                    <li>{{key}}:{{user_event[key]}}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if pagination.total_count>0 %}
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" class="nav-toggle" href="#collapse1">
+                      Show Distribution
+                    </a>
+                </h4>
+            </div>
+            <div id="collapse1" style="display:none"> 
+                <div class="panel-body">                         
+                    <div id="plot">
+                        {{ snippet|safe }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+</div>
+{% endblock %}
  
 {% block script %}
       {{ super() }}
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.css') }}" type="text/css" />
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/continuum.css') }}" type="text/css" />
+      <script type="text/javascript" src="{{ url_for('static', filename='js/bokeh.js') }}"></script>
+      <script type="text/javascript">$('#query').tooltip('hide')</script>
+{% endblock %}
+
+{% block footscript %}
+      <script src="{{ url_for('static', filename = 'js/jquery-2.0.3.min.js') }}"></script>
       <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script> 
       <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/moment.min.js') }}"></script>
       <script type="text/javascript">
-      $('input[name="daterange"]').daterangepicker(
-  { 
-    format: 'DD-MM-YYYY',
-    startDate: '01-01-2011',
-    endDate: '31-12-2011'
-  }
-);
-$('#query').tooltip('hide')
+          $('input[name="daterange"]').daterangepicker(
+              { 
+                format: 'DD-MM-YYYY',
+                startDate: '01-01-2011',
+                endDate: '31-12-2011'
+              }
+            );
+           <!-- $('#collapse1').collapse('hide') -->
       </script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.css') }}" type="text/css" />
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/continuum.css') }}" type="text/css" />
-        <script type="text/javascript" src="{{ url_for('static', filename='js/bokeh.js') }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.css') }}" type="text/css" />
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/continuum.css') }}" type="text/css" />
-        <script type="text/javascript" src="{{ url_for('static', filename='js/bokeh.js') }}"></script>
+      {{ show_hide("Show distribution","Hide distribution") }}
 {% endblock %}

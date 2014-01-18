@@ -39,10 +39,10 @@ def search():
 @app.route('/search_results/<query>', defaults={'page': 1})
 @app.route('/search_results/<query>/<int:page>')
 def search_results(query,page):
-    results,numberdocs = finddocs(query, MAX_SEARCH_RESULTS)
+    results,numberdocs = finddocs(query,distribution=False,page=page)
     articles=[]
     pagination = Pagination(page, PER_PAGE, numberdocs)
-    for result in results[(page-1)*PER_PAGE:page*PER_PAGE]:
+    for result in results:
         articles.append({'title':result['title'],'code':result['date'].strftime("%Y%m%d")+'+'+str(result['identifier'])})
         #doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
         #articles.append({'title':result['title'],'content':doc.getfullcontent()})

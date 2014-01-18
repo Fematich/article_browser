@@ -22,7 +22,12 @@
     <link href="{{ url_for('static', filename = 'css/bootstrap.css') }}" rel="stylesheet" media="screen">
     
 {% endblock %}
-
+    {% block script %}
+        <script src="{{ url_for('static', filename = 'js/jquery-2.0.3.min.js') }}"></script>
+        <script src="{{ url_for('static', filename = 'vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="http://mbostock.github.com/d3/d3.v2.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% endblock %}
 <head>
     <title>Search Portal</title>
 </head>
@@ -67,12 +72,8 @@
         </div><!--/span-->
       </div><!--/row-->
       <hr>
-    {% block script %}
-        <script src="{{ url_for('static', filename = 'js/jquery-2.0.3.min.js') }}"></script>
-        <script src="{{ url_for('static', filename = 'vendor/bootstrap/js/bootstrap.min.js') }}"></script>
-        <script type="text/javascript" src="http://mbostock.github.com/d3/d3.v2.js"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% endblock %}
+        {% block footscript %}
+        {% endblock %}
       <footer>
         <p>IBCN, 2013-2014</p>
       </footer>
