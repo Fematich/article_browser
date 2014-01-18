@@ -56,7 +56,6 @@ def event(event,query='',daterange=None,page=1):
         else:
             query=form.query.data
             page=1
-            daterange_dates=None
             if form.daterange.data!='':
                 daterange=form.daterange.data
             else:

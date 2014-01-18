@@ -99,7 +99,11 @@ def finddocs(query, daterange=None, page=1,ndocs=PER_PAGE, MAX_SEARCH_RESULTS=MA
             total_docs=results.estimated_length()
             return res, total_docs, daycount
         else:
-            results = searcher.search(myquery,limit=MAX_SEARCH_RESULTS)
+            if daterange!=None:
+                datequery=DateRange("date", daterange[0],daterange[1])
+                results=searcher.search(datequery & myquery, limit=MAX_SEARCH_RESULTS)
+            else:
+                results=searcher.search(myquery, limit=MAX_SEARCH_RESULTS)
             for result in results[(page-1)*ndocs:page*ndocs]:
                 res.append({'title':result['title'],'identifier':result['identifier'],'date':result['date']})              
         total_docs=results.estimated_length()
@@ -112,6 +116,11 @@ def findsnippets(query, daterange=None, page=1,ndocs=PER_PAGE, MAX_SEARCH_RESULT
     with ix.searcher() as searcher:
         parser = QueryParser("content", ix.schema)
         myquery = parser.parse(query)
+        if daterange!=None:
+            datequery=DateRange("date", daterange[0],daterange[1])
+            results = searcher.search(datequery & myquery,limit=MAX_SEARCH_RESULTS)
+        else:
+            results = searcher.search(myquery,limit=MAX_SEARCH_RESULTS)
         if distribution:
             myfacet=Facets().add_field("date",maptype=sorting.Count)
             if daterange!=None:
@@ -121,7 +130,6 @@ def findsnippets(query, daterange=None, page=1,ndocs=PER_PAGE, MAX_SEARCH_RESULT
                 daycount_orig=searcher.search(myquery, groupedby=myfacet,limit=MAX_SEARCH_RESULTS)     
             for day in daycount_orig.groups():
                 daycount[day]=daycount_orig.groups()[day]
-            results = searcher.search(myquery,limit=MAX_SEARCH_RESULTS)
             for result in results[(page-1)*ndocs:page*ndocs]:
                 doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
                 snippet=result.highlights("content", text=doc.getcontent())
@@ -129,7 +137,6 @@ def findsnippets(query, daterange=None, page=1,ndocs=PER_PAGE, MAX_SEARCH_RESULT
             total_docs=results.estimated_length()
             return res, total_docs, daycount
         else:
-            results = searcher.search(myquery,limit=MAX_SEARCH_RESULTS)
             for result in results[(page-1)*ndocs:page*ndocs]:
                 doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
                 snippet=result.highlights("content", text=doc.getcontent())
