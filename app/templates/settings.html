@@ -4,6 +4,21 @@
 
 {% block body %}
 <h1>Change the settings of the Search Portal</h1>
-<p>The administrator has been notified. Sorry for the inconvenience!</p>
-<p><a href="{{url_for('index')}}">Back</a></p>
+<form class="form" action="" method="post" name="settings">
+    <fieldset>
+        {% for setting in settings %}
+            <div class="form-group" >
+                <div class="col-lg-9">
+                     <div class="checkbox">
+                        <label>
+                          <input type="checkbox" name="{{setting}}" id="{{setting}}" checked={{settings[setting]}}> {{setting}}
+                        </label>
+                      </div>
+                </div>
+            </div>
+        {% endfor %}
+        <br>
+        <button type="submit" class="btn">Save</button>
+    </fieldset>
+</form>
 {% endblock %}

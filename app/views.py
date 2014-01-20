@@ -1,6 +1,8 @@
 import json
 from flask import Flask, flash, redirect, render_template, g, abort, request, url_for
-from app import app
+from flask_security.core import current_user
+from flask.ext.security import login_required
+from app import app, db
 import utils, mongo_utils
 from utils import finddocs,PoorDoc
 from forms import SearchForm
@@ -24,6 +26,10 @@ def article(code):
 @app.before_request
 def before_request():
     g.search_form = SearchForm()
+    g.user = current_user
+    if g.user.is_authenticated():
+        db.session.add(g.user)
+        db.session.commit()
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -61,8 +67,19 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 @app.route('/settings', methods=['GET', 'POST'])
+@login_required
 def settings():
-    return render_template('settings.html',)
+    settings=mongo_utils.get_usersettings(user=g.user.id)
+#    if request.method == 'POST':
+    print request.form
+    for field in request.form:
+        print field, request.form[field]
+        settings[field]=request.form[field]
+    mongo_utils.update_usersettings(g.user.id,settings)
+    flash("Succesfully edited settings")
+    return render_template('settings.html',settings=settings)
+        
+
 
 @app.route('/results/<rtype>/<name>')
 @app.route('/results/<rtype>')

@@ -18,5 +18,6 @@ security = Security(app, user_datastore)
 
 from views import *
 #import blueprints
-from app import annotate
-app.register_blueprint(annotate.annotate,url_prefix='/annotate')
+from app import event_queries, annotate_articles
+app.register_blueprint(event_queries.annotate,url_prefix='/queries')
+app.register_blueprint(annotate_articles.annotate_articles,url_prefix='/annotate')

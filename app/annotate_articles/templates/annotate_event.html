@@ -1,0 +1,109 @@
+{% set active_page = 'Annotate' -%}
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% from 'macros.html' import tablesorter, render_pagination %}
+{% set relations = ['Core','Strong','Weak','Distant','No','(probleem)'] -%}
+{% block css %}
+      {{ super() }}
+      <link href="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+<h1>{{event.name}}</h1><a href="{{event.link}}" target="_blank">Wikipedia page</a>
+<p>{{nresults}} articles</p>
+{% if pagination.total_count>0 %}
+    {{render_pagination(pagination, page_gen)}}
+    <form class="form" action="{{url_for('annotate.submit_event',event=event.name)}}" method="post" name="search">
+    <fieldset>
+    <table class="table table-striped">
+      <thead>
+                <tr>
+                    {%- for heading in ['date','title','relatedness'] %}
+                      <th>{{heading}}</th>
+                    {%- endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {%- for article in articles %}
+                    <tr>
+                          <td>{{article.date.strftime('%d/%m/%Y')}}</td>
+                          <td>
+                              <a href={{ url_for('article', code=article.code) }}>{{article.title[:120]}}</a>
+                              <br>{{article.snippet|safe}} ...
+                          </td>
+                          <td>
+                            <div class="form-group" >
+                                <div class="col-lg-9">
+                                    
+                                        {% if article.relevance==None %}
+                                            {% for relation in relations %}
+                                                <div class="radio"><input type="radio" name="{{article.code}}" id="{{relation}}" value={{relation}}>{{relation}}</div>
+                                            {% endfor %}
+                                        {% else %}
+                                            {{article.relevance}}
+                                        {% endif %}
+                                    
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if article.relevance==None %}
+                                <button type="submit" class="btn">Submit</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {%- endfor %}
+            </tbody>
+        </table>
+    <button type="submit" class="btn">Submit</button>
+      </fieldset>
+    </form>
+    {{render_pagination(pagination, page_gen)}}
+{% endif %}
+{% endblock %}
+
+{% block sidebar %}
+<div class="well sidebar-nav">
+    <div class="panel-group" id="accordion">
+      <div class="panel panel-default">
+        
+        
+        <div class="panel-heading">
+            <h4 class="panel-title">Stats</h4>
+        </div>
+        {% if user_event!=None %}
+            <div class="panel-body">
+                <ul>
+                {% for key in user_event %}
+                    <li>{{key}}:{{user_event[key]}}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+</div>
+{% endblock %}
+ 
+{% block script %}
+      {{ super() }}
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.css') }}" type="text/css" />
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/continuum.css') }}" type="text/css" />
+      <script type="text/javascript" src="{{ url_for('static', filename='js/bokeh.js') }}"></script>
+      <script type="text/javascript">$('#query').tooltip('hide')</script>
+{% endblock %}
+
+{% block footscript %}
+      <script src="{{ url_for('static', filename = 'js/jquery-2.0.3.min.js') }}"></script>
+      <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script> 
+      <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/moment.min.js') }}"></script>
+      <script type="text/javascript">
+          $('input[name="daterange"]').daterangepicker(
+              { 
+                format: 'DD-MM-YYYY',
+                startDate: '01-01-2011',
+                endDate: '31-12-2011'
+              }
+            );
+           <!-- $('#collapse1').collapse('hide') -->
+      </script>
+{% endblock %}

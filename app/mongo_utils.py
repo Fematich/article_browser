@@ -12,7 +12,7 @@ logger=logging.getLogger("Mongo_utils")
 
 db = pymongo.MongoClient()
 evaluation=db.evaluation
-
+annotations=db.annotations
 def cleanoutput(variable,key):
     if type(variable) is float:
         if key=="F1":
@@ -143,6 +143,20 @@ def get_F1ifvbig(name,rtype='compare_events_cos',big=3):
         except Exception:
             print res
     return entries
+
+def get_usersettings(user):
+    settings=annotations.user_settings.find_one({"user":user})
+    if not settings:
+        settings={"full articles":0}
+    return settings["settings"]
+
+
+def update_usersettings(user,settings):
+    annotations.user_settings.update({"user":user},
+                                {"user":user,"settings": settings},
+                                upsert=True
+                                )
+
 
 if __name__ == '__main__':
     print get_all_compare_events()

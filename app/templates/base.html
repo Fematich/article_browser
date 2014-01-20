@@ -32,11 +32,13 @@
     <title>Search Portal</title>
 </head>
 <body>
+    <!-- ('/', 'Home'),
+    
+    (url_for('results'), 'Results'),//-->
 {% set navigation_bar = [
-    ('/', 'Home'),
     (url_for('settings'), 'Settings'),
-    (url_for('results'), 'Results'),
-    (url_for('annotate.index'), 'Annotate')
+    (url_for('annotate.index'), 'Queries'),
+    (url_for('annotate_articles.index'), 'Annotate')
 ] -%}
 {% set active_page = active_page|default('index') -%}
     <div class="navbar navbar-inverse navbar-fixed-top">
