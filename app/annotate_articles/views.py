@@ -12,11 +12,13 @@ from app import db
 from . import annotate_articles
 import mongo_utils
 from forms import SearchDateRangeForm
-from app.utils import finddocs, build_timeplot, PoorDoc, findsnippets
+from app.utils import finddocs, build_timeplot, PoorDoc, findsnippets, getdocs
 from app.models import Pagination
 from config import PER_PAGE, content
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger=logging.getLogger("TODO")
+
+content=True
 
 @annotate_articles.before_request
 def before_request():
@@ -24,7 +26,6 @@ def before_request():
     if g.user.is_authenticated():
         db.session.add(g.user)
         db.session.commit()
-
 
 @annotate_articles.route('/')
 @annotate_articles.route('/index')
@@ -49,18 +50,28 @@ def event(event,page=1):
             dates=daterange.split(' - ')
             daterange_dates=[datetime.strptime(date,"%d-%m-%Y") for date in dates]
         except Exception:
-            daterange_dates=None
-    results, numberdocs = findsnippets(query, daterange=daterange_dates, page=page, distribution=False)
+            daterange_dates=None           
+    if content:
+        results, numberdocs = getdocs(name=event["name"],page=page)
+#        results, numberdocs = finddocs(query, daterange=daterange_dates, page=page, distribution=False)
+    else:
+        results, numberdocs = findsnippets(query, daterange=daterange_dates, page=page, distribution=False)
     pagination = Pagination(page, PER_PAGE, numberdocs)
     articles=[]
     annotated_articles=mongo_utils.get_user_articles(event['name'],g.user.id)
     relevance={}
     for article in annotated_articles:
         relevance[article["article_id"]]=article['relevance']
-    for result in results:
-        code=result['date'].strftime("%Y%m%d")+'+'+str(result['identifier'])
-        articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':result['snippet']})
         
+    
+    if content:
+        for result in results:
+            code=result['date'].strftime("%Y%m%d")+'+'+str(result['identifier'])
+            doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
+            articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':doc.getcontent()})
+    else:
+        for result in results:
+            articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':result['snippet']})        
     return render_template('annotate_event.html',
                            event=event,
                            user_event=mongo_utils.get_user_event(event['name'],g.user.id),
@@ -75,12 +86,11 @@ def event(event,page=1):
 @annotate_articles.route('submit/<event>', methods = ['POST'])
 @login_required
 def submit_event(event):
-    articles=[]
     cnt=0
     for field in request.form:
         article={"article_id":field,"relevance":request.form[field]}
         mongo_utils.add_user_article(name=event,user=g.user.id,article=article)
         cnt+=1
     flash("Succesfully submitted %d articles"%cnt)
-        
-    return redirect(request.referrer)
+#    return True
+#    return redirect(request.referrer)

@@ -4,7 +4,7 @@
 @date:      ...
 """
 import logging, pymongo
-
+from . import utils
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger=logging.getLogger("mongo-utils")
 
@@ -88,5 +88,15 @@ http://datanews.knack.be/ict/nieuws/bellens-neemt-fagard-opnieuw-in-dienst-ondan
         link,name=event.split(' | ')
         annotations.reference_events.insert({"name":name.replace(' - Wikipedia',''),"link":link})
 
+def add_reference_articles(name):
+    event=annotations.reference_events.find_one({"name":name})
+    results, numberdocs=utils.finddocs(event["query"], daterange=event["daterange"], ndocs=999999999999999, MAX_SEARCH_RESULTS=None,distribution=False)
+    for article in results:
+        annotations.reference_events.update({"name":name},
+                                    {"$addToSet": {"articles": article}},
+                                    upsert=True
+                                    )
+    
 if __name__ == '__main__':
-    add_events()
+#    add_events()
+    add_reference_articles("Aanslagen in Noorwegen 2011")

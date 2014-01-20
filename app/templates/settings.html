@@ -9,11 +9,10 @@
         {% for setting in settings %}
             <div class="form-group" >
                 <div class="col-lg-9">
-                     <div class="checkbox">
-                        <label>
-                          <input type="checkbox" name="{{setting}}" id="{{setting}}" checked={{settings[setting]}}> {{setting}}
-                        </label>
-                      </div>
+                    {{setting}}:
+                  {% for relation in ['complete','snippet'] %}
+                  <div class="radio"><input type="radio" name="{{setting}}" id="{{relation}}" value={{relation}} {% if settings[setting]==relation %} checked {% endif %}>{{relation}}</div>
+                  {% endfor %}
                 </div>
             </div>
         {% endfor %}

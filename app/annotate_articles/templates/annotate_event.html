@@ -12,7 +12,7 @@
 <p>{{nresults}} articles</p>
 {% if pagination.total_count>0 %}
     {{render_pagination(pagination, page_gen)}}
-    <form class="form" action="{{url_for('annotate.submit_event',event=event.name)}}" method="post" name="search">
+    <form action="{{url_for('annotate.submit_event',event=event.name)}}" method="post" name="annotateform" id="annotateform">
     <fieldset>
     <table class="table table-striped">
       <thead>
@@ -30,26 +30,28 @@
                               <a href={{ url_for('article', code=article.code) }}>{{article.title[:120]}}</a>
                               <br>{{article.snippet|safe}} ...
                           </td>
-                          <td>
-                            <div class="form-group" >
-                                <div class="col-lg-9">
-                                    
-                                        {% if article.relevance==None %}
-                                            {% for relation in relations %}
-                                                <div class="radio"><input type="radio" name="{{article.code}}" id="{{relation}}" value={{relation}}>{{relation}}</div>
-                                            {% endfor %}
-                                        {% else %}
-                                            {{article.relevance}}
-                                        {% endif %}
-                                    
+                          <div name="relevance" id="relevance">
+                              <td>
+                                <div class="form-group">
+                                    <div class="col-lg-9">
+                                        
+                                            {% if article.relevance==None %}
+                                                {% for relation in relations %}
+                                                    <div class="radio"><input type="radio" name="{{article.code}}" id="{{relation}}" value={{relation}}>{{relation}}</div>
+                                                {% endfor %}
+                                            {% else %}
+                                                {{article.relevance}}
+                                            {% endif %}
+                                        
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            {% if article.relevance==None %}
-                                <button type="submit" class="btn">Submit</button>
-                            {% endif %}
-                        </td>
+                            </td>
+                            <td>
+                                {% if article.relevance==None %}
+                                    <button type="submit" class="btn">Submit</button>
+                                {% endif %}
+                            </td>
+                        </div>
                     </tr>
                 {%- endfor %}
             </tbody>
@@ -86,24 +88,15 @@
  
 {% block script %}
       {{ super() }}
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.css') }}" type="text/css" />
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/continuum.css') }}" type="text/css" />
-      <script type="text/javascript" src="{{ url_for('static', filename='js/bokeh.js') }}"></script>
       <script type="text/javascript">$('#query').tooltip('hide')</script>
-{% endblock %}
 
-{% block footscript %}
-      <script src="{{ url_for('static', filename = 'js/jquery-2.0.3.min.js') }}"></script>
-      <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script> 
-      <script src="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/moment.min.js') }}"></script>
-      <script type="text/javascript">
-          $('input[name="daterange"]').daterangepicker(
-              { 
-                format: 'DD-MM-YYYY',
-                startDate: '01-01-2011',
-                endDate: '31-12-2011'
-              }
-            );
-           <!-- $('#collapse1').collapse('hide') -->
-      </script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>  
+    <script> 
+        // wait for the DOM to be loaded 
+        $(document).ready(function() { 
+            $('#annotateform').ajaxForm(function() { 
+                $("#relevance" ).reload({{request.path}});
+            }); 
+        }); 
+    </script> 
 {% endblock %}

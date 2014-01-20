@@ -3,8 +3,9 @@
 @date:      Wed Nov 20 13:06:07 2013
 """
 
-import zipfile
+import zipfile, pymongo
 import pandas as pd
+from datetime import datetime
 from xml.dom.minidom import parseString
 from whoosh import sorting
 from whoosh.index import open_dir
@@ -18,10 +19,23 @@ import numpy as np
 import os
 import nltk
 import logging
-from config import plotdir,poordirectory, indexdir, MAX_SEARCH_RESULTS,PER_PAGE, snippet_length
+#from config import plotdir,poordirectory, indexdir, MAX_SEARCH_RESULTS,PER_PAGE, snippet_length
+
+################################################################
+####################### search settings ########################
+MAX_SEARCH_RESULTS = None
+PER_PAGE = 20
+################################################################
+content=False
+snippet_length=800
+poordirectory="/home/mfeys/work/data/poor"
+indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
+plotdir='/home/mfeys/work/article_browser/app/static/plots/'
+################################################################
 
 logger=logging.getLogger("utils")
-
+db = pymongo.MongoClient()
+annotations=db.annotations
 
 class PoorDay():
     def __init__(self,docs=None,date=None,zipname=None,poordirectory=poordirectory):
@@ -109,6 +123,15 @@ def finddocs(query, daterange=None, page=1,ndocs=PER_PAGE, MAX_SEARCH_RESULTS=MA
         total_docs=results.estimated_length()
         return res, total_docs
 
+def getdocs(name, page=1,ndocs=PER_PAGE):
+    res=[]
+    results=annotations.reference_events.find_one({"name":name})['articles']
+    for result in results[(page-1)*ndocs:page*ndocs]:
+        doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
+        res.append({'title':doc.gettitle(),'identifier':result['identifier'],'date':result['date'],'snippet':doc.getcontent()})              
+    total_docs=len(results)
+    return res, total_docs
+
 def findsnippets(query, daterange=None, page=1,ndocs=PER_PAGE, MAX_SEARCH_RESULTS=MAX_SEARCH_RESULTS,distribution=True):
     ix = open_dir(indexdir)
     res=[]
@@ -178,3 +201,24 @@ def build_timeplot(data):
     snippet = curplot().create_html_snippet(embed_base_url='/static/plots/', embed_save_loc=plotdir)
     # Return the snippet we want to place in our page.
     return snippet
+    
+def add_reference_articles(name):
+    event=annotations.reference_events.find_one({"name":name})
+    daterange=event["daterange"]
+    if daterange!=None:
+        try:
+            dates=daterange.split(' - ')
+            daterange_dates=[datetime.strptime(date,"%d-%m-%Y") for date in dates]
+        except Exception:
+            daterange_dates=None      
+    results, numberdocs=finddocs(event["query"], daterange=daterange_dates, ndocs=999999999999999, MAX_SEARCH_RESULTS=None,distribution=False)
+    for article in results:
+        annotations.reference_events.update({"name":name},
+                                    {"$addToSet": {"articles": article}},
+                                    upsert=True
+                                    )
+if __name__ == '__main__':
+#    add_events()
+    for event in annotations.reference_events.find({'query':{'$exists':True},'articles':{'$exists':False}}):
+        print event["name"]
+        add_reference_articles(event["name"])

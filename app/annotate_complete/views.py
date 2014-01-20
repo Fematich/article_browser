@@ -121,6 +121,7 @@ def event(event,query='',daterange=None,page=1):
 def submit_event(event):
     articles=[]
     cnt=0
+    print 'event submitted'
     for field in request.form:
         article={"article_id":field,"relevance":request.form[field]}
         mongo_utils.add_user_article(name=event,user=g.user.id,article=article)
