@@ -36,4 +36,4 @@ PER_PAGE = 20
 ######################## data settings #########################
 from local_config import *
 content=False
-snippet_length=800
+SNIPPET_LENGTH=3000

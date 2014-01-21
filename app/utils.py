@@ -19,7 +19,7 @@ import numpy as np
 import os
 import nltk
 import logging
-#from config import plotdir,poordirectory, indexdir, MAX_SEARCH_RESULTS,PER_PAGE, snippet_length
+#from config import plotdir,poordirectory, indexdir, MAX_SEARCH_RESULTS,PER_PAGE, SNIPPET_LENGTH
 
 ################################################################
 ####################### search settings ########################
@@ -27,7 +27,7 @@ MAX_SEARCH_RESULTS = None
 PER_PAGE = 20
 ################################################################
 content=False
-snippet_length=800
+SNIPPET_LENGTH=2000
 poordirectory="/home/mfeys/work/data/poor"
 indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
 plotdir='/home/mfeys/work/article_browser/app/static/plots/'
@@ -69,7 +69,7 @@ class PoorDoc():
     
     def getsnippet(self):
         content=self.dom.getElementsByTagName('body.content')
-        return nltk.clean_html(content[0].toxml()[:snippet_length])
+        return nltk.clean_html(content[0].toxml())
 
     def getfullcontent(self):
         content=self.dom.getElementsByTagName('body.content')

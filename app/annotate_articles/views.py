@@ -14,7 +14,7 @@ import mongo_utils
 from forms import SearchDateRangeForm
 from app.utils import finddocs, build_timeplot, PoorDoc, findsnippets, getdocs
 from app.models import Pagination
-from config import PER_PAGE, content
+from config import PER_PAGE, content, SNIPPET_LENGTH
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger=logging.getLogger("TODO")
 
@@ -68,7 +68,10 @@ def event(event,page=1):
         for result in results:
             code=result['date'].strftime("%Y%m%d")+'+'+str(result['identifier'])
             doc=PoorDoc(docidentifier=result['identifier'],date=int(result['date'].strftime("%Y%m%d")))
-            articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':doc.getcontent()})
+            snip=doc.getsnippet()[:SNIPPET_LENGTH]
+            if len(snip)==SNIPPET_LENGTH:
+                snip=snip+"<a href="+url_for('article', code=code)+" >"+' ... More'+"</a>"
+            articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':snip})
     else:
         for result in results:
             articles.append({'title':result['title'],'code':code,'date':result['date'],'relevance':relevance.get(code),'snippet':result['snippet']})        
@@ -87,10 +90,12 @@ def event(event,page=1):
 @login_required
 def submit_event(event):
     cnt=0
+    last_id=''
     for field in request.form:
         article={"article_id":field,"relevance":request.form[field]}
+        last_id=field
         mongo_utils.add_user_article(name=event,user=g.user.id,article=article)
         cnt+=1
     flash("Succesfully submitted %d articles"%cnt)
 #    return True
-#    return redirect(request.referrer)
+    return redirect(request.referrer+'#article'+last_id)

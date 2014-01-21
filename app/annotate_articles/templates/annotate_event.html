@@ -3,16 +3,12 @@
 {% extends "base.html" %}
 {% from 'macros.html' import tablesorter, render_pagination %}
 {% set relations = ['Core','Strong','Weak','Distant','No','(probleem)'] -%}
-{% block css %}
-      {{ super() }}
-      <link href="{{ url_for('static', filename = 'vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet">
-{% endblock %}
 {% block body %}
 <h1>{{event.name}}</h1><a href="{{event.link}}" target="_blank">Wikipedia page</a>
 <p>{{nresults}} articles</p>
 {% if pagination.total_count>0 %}
     {{render_pagination(pagination, page_gen)}}
-    <form action="{{url_for('annotate.submit_event',event=event.name)}}" method="post" name="annotateform" id="annotateform">
+    <form action="{{url_for('annotate_articles.submit_event',event=event.name)}}" method="post" name="annotateform" id="annotateform">
     <fieldset>
     <table class="table table-striped">
       <thead>
@@ -27,8 +23,8 @@
                     <tr>
                           <td>{{article.date.strftime('%d/%m/%Y')}}</td>
                           <td>
-                              <a href={{ url_for('article', code=article.code) }}>{{article.title[:120]}}</a>
-                              <br>{{article.snippet|safe}} ...
+                              <a href={{ url_for('article', code=article.code) }} name=article{{article.code}}>{{article.title[:120]}}</a>
+                              <br>{{article.snippet|safe}}
                           </td>
                           <div name="relevance" id="relevance">
                               <td>
@@ -89,14 +85,4 @@
 {% block script %}
       {{ super() }}
       <script type="text/javascript">$('#query').tooltip('hide')</script>
-
-    <script src="http://malsup.github.com/jquery.form.js"></script>  
-    <script> 
-        // wait for the DOM to be loaded 
-        $(document).ready(function() { 
-            $('#annotateform').ajaxForm(function() { 
-                $("#relevance" ).reload({{request.path}});
-            }); 
-        }); 
-    </script> 
 {% endblock %}

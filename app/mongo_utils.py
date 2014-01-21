@@ -147,8 +147,9 @@ def get_F1ifvbig(name,rtype='compare_events_cos',big=3):
 def get_usersettings(user):
     settings=annotations.user_settings.find_one({"user":user})
     if not settings:
-        settings={"article view":"snippet"}
-    return settings["settings"]
+        return {"article view":"snippet"}
+    else:
+        return settings["settings"]
 
 
 def update_usersettings(user,settings):
