@@ -3,7 +3,10 @@
 {% set active_page = "Settings" %}
 
 {% block body %}
-<h1>Change the settings of the Search Portal</h1>
+<h1>Settings for {{g.user.email}}:</h1>
+<h3>Account settings</h3>
+<div class="form-group"> <a href={{url_for('security.change_password')}}>Edit password</a></div>
+<h3>Article settings</h3>
 <form class="form" action="" method="post" name="settings">
     <fieldset>
         {% for setting in settings %}

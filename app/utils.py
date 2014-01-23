@@ -19,18 +19,18 @@ import numpy as np
 import os
 import nltk
 import logging
-#from config import plotdir,poordirectory, indexdir, MAX_SEARCH_RESULTS,PER_PAGE, SNIPPET_LENGTH
+from config import plotdir,poordirectory, indexdir, MAX_SEARCH_RESULTS,PER_PAGE, SNIPPET_LENGTH
 
 ################################################################
 ####################### search settings ########################
-MAX_SEARCH_RESULTS = None
-PER_PAGE = 20
-################################################################
-content=False
-SNIPPET_LENGTH=2000
-poordirectory="/home/mfeys/work/data/poor"
-indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
-plotdir='/home/mfeys/work/article_browser/app/static/plots/'
+#MAX_SEARCH_RESULTS = None
+#PER_PAGE = 20
+#################################################################
+#content=False
+#SNIPPET_LENGTH=2000
+#poordirectory="/home/mfeys/work/data/poor"
+#indexdir='/home/mfeys/work/dataprocessing/Reuters/index/index'
+#plotdir='/home/mfeys/work/article_browser/app/static/plots/'
 ################################################################
 
 logger=logging.getLogger("utils")

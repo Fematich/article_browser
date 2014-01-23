@@ -32,6 +32,8 @@ def before_request():
 @login_required
 def index():
     events=mongo_utils.get_events(query={'query':{'$exists':True}})
+    for event in events:
+        event['annotated']=mongo_utils.get_user_event(event['name'],g.user.id)['# annotated articles']
     return render_template('annotate_index.html',events=events)
 
 

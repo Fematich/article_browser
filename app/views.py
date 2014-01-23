@@ -71,10 +71,13 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 def settings():
     settings=mongo_utils.get_usersettings(user=g.user.id)
 #    if request.method == 'POST':
+    edit=False
     for field in request.form:
+        edit=True
         settings[field]=request.form[field]
+    if edit:
+        flash("Succesfully edited settings")
     mongo_utils.update_usersettings(g.user.id,settings)
-    flash("Succesfully edited settings")
     return render_template('settings.html',settings=settings)
         
 

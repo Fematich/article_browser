@@ -41,6 +41,8 @@ def get_user_event(name,user):
         user_event.pop("user", None)
         if "articles" in user_event:
             user_event['# annotated articles']=len(user_event.pop('articles'))
+        else:
+            user_event['# annotated articles']=0
         return user_event
         
 def save_query(name,user,query,daterange):
