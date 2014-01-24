@@ -34,7 +34,7 @@ def get_user_articles(name,user):
 def get_user_event(name,user):
     user_event=annotations.user_events.find_one({"name":name,"user":user})
     if not user_event:
-        return None
+        return {'# annotated articles':0}
     else:
         user_event.pop("_id", None)
         user_event.pop("name", None)
@@ -44,7 +44,30 @@ def get_user_event(name,user):
         else:
             user_event['# annotated articles']=0
         return user_event
-        
+
+def get_all_user_events():
+    entries=[]    
+    total_annotations=0
+    user_totals={}
+    event_totals={}
+    headings=['name','user','# articles']
+    for res in annotations.user_events.find():
+        if 'articles' in res:
+            n_articles=len(res['articles'])
+            try:
+                event_totals[res['name']]+=n_articles
+            except KeyError:
+                event_totals[res['name']]=n_articles
+            try:
+                user_totals[res['user']]+=n_articles
+            except KeyError:
+                user_totals[res['user']]=n_articles
+            elements={"name":res['name'],"user":res['user'],"# articles":n_articles}
+            total_annotations+=n_articles
+            entry=[elements[key] for key in headings]
+            entries.append(entry)
+    return headings, entries,total_annotations,user_totals,event_totals
+
 def save_query(name,user,query,daterange):
     annotations.user_events.update({"name":name,"user":user},
                                     {"$set":{"query": query, "daterange":daterange}},

@@ -1,7 +1,7 @@
 import json
 from flask import Flask, flash, redirect, render_template, g, abort, request, url_for
 from flask_security.core import current_user
-from flask.ext.security import login_required
+from flask.ext.security import login_required, roles_required
 from app import app, db
 import utils, mongo_utils
 from utils import finddocs,PoorDoc
@@ -81,10 +81,10 @@ def settings():
     return render_template('settings.html',settings=settings)
         
 
-
 @app.route('/results/<rtype>/<name>')
 @app.route('/results/<rtype>')
 @app.route('/results')
+@roles_required('admin')
 def results(rtype=None,name=''):
     if rtype==None:
         return render_template('results.html',types=mongo_utils.get_result_types())

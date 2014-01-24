@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 from flask import flash, redirect, render_template, g, url_for, abort, request
 from flask_security.core import current_user
-from flask.ext.security import login_required
+from flask.ext.security import login_required, roles_required
 from app import db
 from . import annotate_articles
 import mongo_utils
@@ -101,3 +101,9 @@ def submit_event(event):
     flash("Succesfully submitted %d articles"%cnt)
 #    return True
     return redirect(request.referrer+'#article'+last_id)
+
+@annotate_articles.route('/results')
+@roles_required('admin')
+def results():
+   headings, entries, total_annotations,user_totals,event_totals =mongo_utils.get_all_user_events()
+   return render_template('summary_annotations.html',headings=headings,entries=entries,total_annotations=total_annotations,user_totals=user_totals,event_totals=event_totals)

@@ -205,6 +205,7 @@ def build_timeplot(data):
 def add_reference_articles(name):
     event=annotations.reference_events.find_one({"name":name})
     daterange=event["daterange"]
+    daterange_dates=None
     if daterange!=None:
         try:
             dates=daterange.split(' - ')
@@ -217,8 +218,8 @@ def add_reference_articles(name):
                                     {"$addToSet": {"articles": article}},
                                     upsert=True
                                     )
-if __name__ == '__main__':
+#if __name__ == '__main__':
 #    add_events()
-    for event in annotations.reference_events.find({'query':{'$exists':True},'articles':{'$exists':False}}):
-        print event["name"]
-        add_reference_articles(event["name"])
+#    for event in annotations.reference_events.find({'query':{'$exists':True},'articles':{'$exists':False}}):
+#        print event["name"]
+#        add_reference_articles(event["name"])

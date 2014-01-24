@@ -32,9 +32,11 @@
     <title>Search Portal</title>
 </head>
 <body>
-    <!-- ('/', 'Home'),
-    
-    (url_for('results'), 'Results'),//-->
+
+{% set admin_navigation_bar = [
+    (url_for('results'), 'Results')
+] -%}
+
 {% set navigation_bar = [
     (url_for('settings'), 'Settings'),
     (url_for('annotate.index'), 'Queries'),
@@ -49,15 +51,23 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Search Portal</a>
-          <div class="nav-collapse collapse">
-            <form class="navbar-search pull-right" action="{{url_for('search')}}" method="post" name="search">{{g.search_form.hidden_tag()}}{{g.search_form.search(size=20,placeholder="Search",class="search-query")}}</form>
-            <ul class="nav">
+          <a class="brand" href="/">Search Portal</a>
+          <div class="nav-collapse collapse">            
+            <ul class="nav navbar-nav">
 		{% for href, caption in navigation_bar %}
   			<li{% if caption == active_page %} class="active"{% endif
   			%}><a href="{{ href|e }}">{{ caption|e }}</a></li>
 		{% endfor %}
             </ul>
+            {% if g.user.id==1 %} 
+                <form class="navbar-search pull-right" action="{{url_for('search')}}" method="post" name="search">{{g.search_form.hidden_tag()}}{{g.search_form.search(size=20,placeholder="Search",class="search-query")}}</form>
+                <ul class="nav navbar-nav pull-right">
+        		{% for href, caption in admin_navigation_bar %}
+      			<li{% if caption == active_page %} class="active"{% endif
+              		%}><a href="{{ href|e }}">{{ caption|e }}</a></li>
+           		{% endfor %}
+                </ul>
+            {% endif %} 
           </div><!--/.nav-collapse -->
         </div>
       </div>

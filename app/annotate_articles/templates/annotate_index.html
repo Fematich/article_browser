@@ -27,4 +27,10 @@ Als je het artikel gelezen hebt, kun je teruggaan naar de annotaties, door back 
         <li> <a href="{{url_for('annotate_articles.event',event=event.name)}}">{{event.name}}</a> annotated: {{event.annotated}} </li>
     {% endfor %}
 </ul>
+{% if g.user.id in [1,2] %}
+    <h4>Links</h4>
+        <ul>
+            <li> <a href="{{url_for('annotate_articles.results')}}">Summary of annotations</a></li>
+        </ul>
+{% endif %}
 {% endblock %}

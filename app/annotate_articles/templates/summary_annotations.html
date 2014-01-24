@@ -1,0 +1,34 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% from 'macros.html' import tablesorter %}
+{% block script %}
+      {{ super() }}
+        <!-- tablesorter plugin -->
+        <script src="{{ url_for('static', filename = 'vendor/tablesorter/js/jquery.tablesorter.min.js') }}"></script>
+        <!-- tablesorter widget file - loaded after the plugin -->
+        <script src="{{ url_for('static', filename = 'vendor/tablesorter/js/jquery.tablesorter.widgets.min.js') }}"></script>
+        <!-- blue theme stylesheet -->
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'vendor/tablesorter/css/theme.blue.css') }}">
+      {{ tablesorter() }}
+{% endblock %}
+<!--{% set active_page = "Results" %} -->
+{% block sidebar %}
+<div class="well sidebar-nav">
+            <ul class="nav nav-list  nav-stacked">
+              <li class="nav-header">Global Totals</li>
+              <li><B>Global Total:</B> &ensp; {{total_annotations}}</li>
+              <li class="nav-header">User Totals</li>
+              {% for user in user_totals %}
+                <li><B>{{user}}:</B> &ensp; {{user_totals[user]}}</li>
+              {% endfor %}
+              <li class="nav-header">Event Totals</li>
+              {% for event in event_totals %}
+                <li><B>{{event}}:</B> &ensp; {{event_totals[event]}}</li>
+              {% endfor %}
+            </ul>
+          </div>
+
+{% endblock %}
+{% block body %}
+{% include 'table_block.html' %}
+{% endblock %}
