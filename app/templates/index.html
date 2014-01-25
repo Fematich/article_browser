@@ -4,6 +4,11 @@
 
 {% block body %}
 <h1>Projects</h1>
-<p>In progress...</p>
-
+<ul>
+{% for href, caption in navigation_bar %}
+    {% if caption!='Settings' %}
+  	<li><a href="{{ href|e }}">{{ caption|e }}</a></li>
+    {% endif %}
+{% endfor %}
+</ul>
 {% endblock %}
